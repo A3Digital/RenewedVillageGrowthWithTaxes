@@ -15,7 +15,7 @@ class MainClass extends GSInfo
     {
     function GetAuthor()                { return "Firrel/A3_Digital"; }
     function GetName()                  { return "Renewed Village Growth with Taxes"; }
-    function GetShortName()             { return "REVT"; }
+    function GetShortName()             { return "RVGT"; }
     function GetDescription()           { return "Towns require various cargo deliveries to grow. Required cargos can be randomized. Town growth is limited by percentage of transported specific cargos. Supporting most Industry NewGRF sets. Also has Taxes!"; }
     function GetURL()                   { return "https://github.com/A3Digital/RenewedVillageGrowthWithTaxes"; }
     function GetVersion()               { return SELF_VERSION; }
