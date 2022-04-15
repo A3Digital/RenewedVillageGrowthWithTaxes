@@ -15,6 +15,18 @@ Helper <- SuperLib.Helper;
 import("Library.GSToyLib", "GSToyLib", 1);
 import("Library.SCPLib", "SCPLib", 45);
 
+tax_brackets <- [
+    100000,
+    1000000,
+    -1
+];
+
+tax_rates <- [
+    0.0,
+    0.1,
+    0.2
+];
+
 enum Randomization {
     NONE = 1,
     INDUSTRY_DESC = 2,
@@ -55,6 +67,7 @@ class MainClass extends GSController
     actual_town_info_mode = null;
     toy_lib = null;
     story_editor = null;
+    taxes_collected = null;
 
     constructor() {
         this.companies = [];
@@ -69,6 +82,7 @@ class MainClass extends GSController
         this.actual_town_info_mode = 0;
         this.toy_lib = null;
         this.story_editor = null;
+        this.taxes_collected = false;
         ::TownDataTable <- {};
         ::CompanyDataTable <- {};
         ::SettingsTable <- {};
@@ -234,6 +248,38 @@ function MainClass::HandleEvents()
     }
 }
 
+function MainClass::HandleTaxes()
+{
+    if(!this.taxes_collected && this.current_month == 6) {
+        this.taxes_collected = true;
+
+        foreach(company in this.companies)
+        {
+            local company_value = GSCompany.GetQuarterlyCompanyValue(company.id, GSCompany.CURRENT_QUARTER);
+            local taxes = 0;
+            local company_value_taxed = 0;
+            for(local index = 0; index < 3; index++)
+            {
+                if(tax_brackets[index] == -1 || company_value <= tax_brackets[index]) {
+                    taxes += (company_value - company_value_taxed) * tax_rates[index];
+                    break;
+                } else {
+                    taxes += tax_brackets[index] * tax_rates[index];
+                    company_value_taxed += tax_brackets[index];
+                }
+            }
+            taxes = taxes.tointeger();
+            local taxes_string = taxes.tostring();
+            for(local index = taxes_string.len() - 3; index >= 0; index -= 3) {
+                taxes_string = taxes_string.slice(0, index) + "," + taxes_string.slice(index, taxes_string.len());
+            }
+            GSNews.Create(GSNews.NT_ECONOMY, "Taxes: $" + taxes_string + ".00", company.id, GSNews.NR_NONE, 0);
+            taxes *= -1;
+            GSCompany.ChangeBankBalance(company.id, taxes, GSCompany.EXPENSES_OTHER);
+        }
+    }
+}
+
 function MainClass::Save()
 {
     Log.Info("Saving data...", Log.LVL_INFO);
@@ -253,6 +299,8 @@ function MainClass::Save()
         save_table.randomization <- ::SettingsTable.randomization;
         save_table.display_cargo <- ::SettingsTable.display_cargo;
         save_table.category_min_pop <- ::SettingsTable.category_min_pop;
+
+        save_table.taxes_collected <- this.taxes_collected;
 
         foreach (company in this.companies)
         {
@@ -282,6 +330,8 @@ function MainClass::Load(version, saved_data)
         ::SettingsTable.randomization <- saved_data.randomization;
         ::SettingsTable.display_cargo <- saved_data.display_cargo;
         ::SettingsTable.category_min_pop <- saved_data.category_min_pop;
+
+        this.taxes_collected = saved_data.taxes_collected;
 
         foreach (companyid, company_data in saved_data.company_data_table) {
             ::CompanyDataTable[companyid] <- company_data;
@@ -464,6 +514,9 @@ function MainClass::ManageTowns()
         }
 
         this.current_month = month;
+
+        this.HandleTaxes();
+        
         local month_tick_duration = GSController.GetTick() - month_tick;
         Log.Info("Monthly Update took "+month_tick_duration+" ticks.", Log.LVL_DEBUG);
     }
@@ -479,6 +532,7 @@ function MainClass::ManageTowns()
 
         ProspectRawIndustry();
 
+        this.taxes_collected = false;
         this.current_year = year;
     }
 }
