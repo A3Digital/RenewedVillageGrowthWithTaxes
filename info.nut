@@ -13,11 +13,11 @@ require("version.nut");
 
 class MainClass extends GSInfo
     {
-    function GetAuthor()                { return "Firrel"; }
-    function GetName()                  { return "Renewed Village Growth"; }
-    function GetShortName()             { return "REVI"; }
-    function GetDescription()           { return "Towns require various cargo deliveries to grow. Required cargos can be randomized. Town growth is limited by percentage of transported specific cargos. Supporting most Industry NewGRF sets."; }
-    function GetURL()                   { return "https://www.tt-forums.net/viewtopic.php?f=65&t=87052"; }
+    function GetAuthor()                { return "Firrel/A3_Digigital"; }
+    function GetName()                  { return "Renewed Village Growth with Taxes"; }
+    function GetShortName()             { return "REVIwT"; }
+    function GetDescription()           { return "Towns require various cargo deliveries to grow. Required cargos can be randomized. Town growth is limited by percentage of transported specific cargos. Supporting most Industry NewGRF sets. Also has Taxes!"; }
+    function GetURL()                   { return "https://github.com/A3Digital/RenewedVillageGrowthWithTaxes"; }
     function GetVersion()               { return SELF_VERSION; }
     function GetDate()                  { return SELF_DATE; }
     function GetAPIVersion()            { return "1.10"; }
