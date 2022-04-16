@@ -264,7 +264,7 @@ function MainClass::HandleTaxes()
                     taxes += (company_value - company_value_taxed) * tax_rates[index];
                     break;
                 } else {
-                    taxes += tax_brackets[index] * tax_rates[index];
+                    taxes += (tax_brackets[index] - company_value_taxed) * tax_rates[index];
                     company_value_taxed += tax_brackets[index];
                 }
             }
